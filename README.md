@@ -1,3 +1,5 @@
+![F# logo](https://fsharp.org/img/logo/fsharp512.png)
+
 # 📘 F\# for Researchers
 
 **A practical guide for scientists, data engineers, and ML practitioners transitioning from Python to F\#.**
