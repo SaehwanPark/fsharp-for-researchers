@@ -86,7 +86,7 @@ To run the examples locally:
 
 1.  Clone this repository:
     ```bash
-    git clone https://github.com/SaehwanPark/fsharp-for-research.git
+    git clone https://github.com/SaehwanPark/fsharp-for-researchers.git
     cd fsharp-for-research
     ```
 2.  Navigate to the code samples (if applicable) or use the snippets provided in the markdown chapters with `dotnet fsi`.
