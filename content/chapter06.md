@@ -279,7 +279,7 @@ module MonteCarlo =
 In Python (NumPy), if you have a 2x2 matrix `m` and a length-2 vector `v`, the operation `m + v` will add the vector to every row of the matrix.
 In F\# (Math.NET), the code `m + v` will result in a type error.
 **Question:** Write the F\# code to explicitly add vector `v` to every row of matrix `m`.
-*(Hint: Look for a function on the matrix types called `.MapRows` or similar).*
+*(Hint: Look for a function on the matrix types called `Matrix.mapRows` or similar).*
 
 
 **2. Determinism (Multiple Choice)**
