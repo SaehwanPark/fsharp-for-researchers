@@ -58,8 +58,28 @@ let subM = m.[0..1, 0..1]
 
 ### The "Broadcasting" Difference
 
-NumPy is famous for **broadcasting**—automatically expanding smaller arrays to match larger ones (e.g., adding a scalar to a matrix).
-Math.NET is stricter. You cannot add a Vector to a Matrix directly without being explicit. This prevents "silent dimensionality bugs" where you accidentally add a bias term along the wrong axis.
+NumPy is famous for implicit **broadcasting**—automatically expanding smaller arrays to match larger ones (e.g., adding a row vector to every row of a matrix).
+
+Math.NET takes a hybrid approach:
+
+1.  **Scalar Broadcasting:** Supported. You **can** add, subtract, or multiply a Vector/Matrix by a scalar value (e.g., `v + 5.0`).
+2.  **Rank Expansion:** **Not Supported.** You cannot add a `Vector` to a `Matrix` implicitly.
+
+In NumPy, `matrix + vector` automatically adds the vector to every row. In F\#, this raises a compile-time or runtime error. This strictness is a feature: it prevents "silent dimensionality bugs" where you accidentally add a bias term along the wrong axis.
+
+```fsharp
+let m = matrix [[1.0; 2.0]; [3.0; 4.0]]
+let v = vector [10.0; 20.0]
+
+// 1. Scalar Broadcasting (Works!)
+let m2 = m + 100.0 
+
+// 2. Matrix + Vector (Fails in F#, Works in Python)
+// let m3 = m + v // Error: The type 'Vector<float>' does not match 'Matrix<float>'
+
+// The Correct F# Approach for Row-wise Addition:
+let m3 = m.MapRows(fun row -> row + v)
+```
 
 -----
 
@@ -255,10 +275,12 @@ module MonteCarlo =
 
 ## Exercises
 
-**1. Vector Operations (Short Answer)**
-In Python, `np.array([1, 2]) + 10` results in `[11, 12]`.
-In F\# using Math.NET, `vector [1.0; 2.0] + 10.0` will fail to compile. How do you fix the F\# code to add the scalar 10.0 to every element?
-*(Hint: Look for a `.Add` method or mapping function).*
+**1. Broadcasting Nuances (Short Answer)**
+In Python (NumPy), if you have a 2x2 matrix `m` and a length-2 vector `v`, the operation `m + v` will add the vector to every row of the matrix.
+In F\# (Math.NET), the code `m + v` will result in a type error.
+**Question:** Write the F\# code to explicitly add vector `v` to every row of matrix `m`.
+*(Hint: Look for a function on the matrix types called `.MapRows` or similar).*
+
 
 **2. Determinism (Multiple Choice)**
 Why is passing `rng: System.Random` as a function argument better than creating `let rng = System.Random()` inside the function?
