@@ -83,20 +83,25 @@ If you import a library that *also* sets the seed, or if you run your tests in p
 In functional programming, randomness is treated as a dependency. We pass the random source *into* the function.
 
 ```fsharp
+#r "nuget: MathNet.Numerics"
+#r "nuget: MathNet.Numerics.FSharp"
+
 open MathNet.Numerics.Random
+open MathNet.Numerics.Distributions
 
-// 1. Create a stable source (Mersenne Twister)
-let rng = new MersenneTwister(42)
+// create a stable source (Mersenne Twister)
+let rng = MersenneTwister(343)
 
-// 2. Pass it explicitly
+// pass it explicitly
 let generateNoise (randomSource: System.Random) count =
-    // Generates standard normal samples
-    let dist = MathNet.Numerics.Distributions.Normal(0.0, 1.0)
-    dist.Samples(randomSource) |> Seq.take count |> Seq.toList
+  // generate standard normal samples
+  // use the static method: Normal.Samples (rnd, mean, stdDev)
+  Normal.Samples(randomSource, 0.0, 1.0)
+  |> Seq.take count
+  |> Seq.toList
 
-// 3. Usage
-let run1 = generateNoise rng 5
-// run1 is deterministic. If we recreate 'rng' with 42, we get the same numbers.
+// usage
+let run1 = generateNoise rng 1
 ```
 
 By passing `randomSource` as an argument, you guarantee that `generateNoise` behaves exactly the same way every time it is called with that specific generator state, regardless of what other threads are doing.
