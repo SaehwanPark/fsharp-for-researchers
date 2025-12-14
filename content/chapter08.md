@@ -88,6 +88,7 @@ let (successes, failures) =
     )
 
 // 4. Unwrap the 'Ok' values to get clean ints
+// Not recommendable for production
 let cleanData = 
     successes 
     |> List.map (fun (Ok v) -> v) // Compiler knows this is safe due to partition logic? 
@@ -215,7 +216,7 @@ let processBatch (rows: RawRow list) =
     let validRecords = results |> List.choose (function Ok r -> Some r | _ -> None)
     let errors = results |> List.choose (function Error e -> Some e | _ -> None)
     
-    // Return a Summary Report
+    // Return a Summary Report as a struct
     {| 
         ProcessedCount = rows.Length
         SuccessCount = validRecords.Length
