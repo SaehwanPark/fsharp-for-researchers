@@ -176,6 +176,7 @@ This is the entry point where we compose the pipeline, handle logging, and save 
 
 ```fsharp
 open ClinicalTrial
+open System
 open System.IO
 open System.Text.Json // Standard JSON library
 
