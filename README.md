@@ -2,6 +2,8 @@
 
 # 📘 F\# for Researchers
 
+Author: Sae-Hwan Park, PhD
+
 **A practical guide for scientists, data engineers, and ML practitioners transitioning from Python to F\#.**
 
 This e-book bridges the gap between exploratory scripting and robust, reproducible research engineering. It demonstrates how F\#'s type system, immutability, and functional pipelines can eliminate entire categories of bugs common in scientific workflows without sacrificing the concise, iterative feel of scripting.
