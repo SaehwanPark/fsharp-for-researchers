@@ -94,8 +94,11 @@ let runTrainingLoop epochs =
             |> Chart.withTitle (sprintf "Live Training: Epoch %d" i)
             |> Chart.withSize(600., 400.)
             |> Chart.show 
-            // Note: In a browser, this opens a new tab. 
+            // Note: In a browser, this opens a new tab for every snapshot. 
             // In VS Code Polyglot Notebooks, this updates the output in place.
+
+// Usage
+// runTrainingLoop 200
 ```
 
 ### The "Watch" Pattern
