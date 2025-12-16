@@ -75,6 +75,7 @@ We need to move from the "messy string world" to our nice "typed domain world." 
 namespace ClinicalTrial
 
 module Ingestion =
+    open System
     open System.IO
 
     // Helper to parse the Group column safely
@@ -105,8 +106,9 @@ module Ingestion =
         files
         |> List.collect (fun f -> File.ReadAllLines(f) |> Array.toList |> List.skip 1) // Skip headers
         |> List.map parseLine
-        |> List.partition (fun result -> 
-            match result with | Ok _ -> true | Error _ -> false
+        |> List.partition (function -> 
+            | Ok _ -> true
+            | Error _ -> false
         )
         |> fun (oks, errors) ->
             let validPatients = oks |> List.map (fun (Ok p) -> p)
