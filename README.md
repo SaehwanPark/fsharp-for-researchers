@@ -3,9 +3,11 @@
 # 📘 F\# for Researchers
 
 Author:
+
 Sae-Hwan Park, PhD
+
 Research Data Scientist
-Penn Medicine
+@ Penn Medicine
 
 **A practical guide for scientists, data engineers, and ML practitioners transitioning from Python to F\#.**
 
