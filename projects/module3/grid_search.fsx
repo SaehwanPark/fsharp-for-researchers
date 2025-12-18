@@ -90,7 +90,7 @@ module Runner =
 
   // Execute in Parallel
   let executeBatch (grid: Parameters list) =
-    printfn "Scheduling %d experiments..." grid.Length
+    printfn "Scheduling %d experiments..." (List.length grid)
     
     grid
     // 1. Map inputs to Async computations
