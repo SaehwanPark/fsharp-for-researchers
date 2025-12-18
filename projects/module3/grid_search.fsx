@@ -1,7 +1,6 @@
 // ==========================================
-// 0. Dependencies (Chapter 2 & 10)
+// 0. Dependencies
 // ==========================================
-// NOTE: This requires internet access to fetch the package the first time.
 #r "nuget: Plotly.NET, 4.2.0"
 
 open System
@@ -9,7 +8,7 @@ open Plotly.NET
 open Plotly.NET.LayoutObjects
 
 // ==========================================
-// 1. Domain Module (Chapter 3)
+// 1. Domain Module
 // ==========================================
 module Domain =
   
@@ -59,7 +58,7 @@ module Simulation =
   }
 
 // ==========================================
-// 3. Testing Module (Chapter 11)
+// 3. Testing Module
 // ==========================================
 module Tests =
   open Domain
@@ -75,7 +74,7 @@ module Tests =
       failwithf "FAIL ❌ - Model logic is broken. Expected ~100.0, got %f" y
 
 // ==========================================
-// 4. Runner Module (Chapter 9)
+// 4. Runner Module
 // ==========================================
 module Runner =
   open Domain
@@ -102,7 +101,7 @@ module Runner =
     |> Async.RunSynchronously
 
 // ==========================================
-// 5. Visualization Module (Corrected)
+// 5. Visualization Module
 // ==========================================
 module Viz =
   open Domain
