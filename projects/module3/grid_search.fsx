@@ -29,7 +29,7 @@ module Domain =
 module Simulation =
   open Domain
 
-  // A "fake" expensive scientific calculation
+  // A fake expensive scientific calculation
   // Yield peaks when Pressure is around 5.0 and Temp is around 5.0
   let calculateYield (p: float) (t: float) =
     let x = p - 5.0
@@ -38,7 +38,7 @@ module Simulation =
     let z = 100.0 * Math.Exp(-(x*x + y*y) / 10.0)
     z
 
-  // The Async Workflow (Chapter 9)
+  // The Async Workflow
   // Wraps the calculation with simulated latency
   let runExperimentAsync (params': Parameters) = async {
     let sw = System.Diagnostics.Stopwatch.StartNew()
