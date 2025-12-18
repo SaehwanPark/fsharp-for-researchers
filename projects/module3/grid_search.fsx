@@ -143,7 +143,7 @@ module Viz =
       )
 
     // 3. Create the Chart
-    // Explicitly using the parameter names from your signature
+    // Explicitly using the parameter names from signature
     let chart =
       Chart.Heatmap(
         zData = zMatrix,
