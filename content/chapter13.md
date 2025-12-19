@@ -27,13 +27,11 @@ y = df['Price']
 
 ```
 
-### The F# Approach
+### The F# Approach: Defining the Data Contract
 
-F# excels at defining data schemas. By using **Record Types** and the `LoadColumn` attribute, you bridge the gap between raw data and the type system.
+F# excels at defining data schemas. By using **Record Types** and specific attributes, you bridge the gap between raw data and the type system.
 
 ```fsharp
-#r "nuget: Microsoft.ML"
-
 open Microsoft.ML
 open Microsoft.ML.Data
 
@@ -49,20 +47,21 @@ type PricePrediction = {
     [<ColumnName("Score")>] PredictedPrice: float32
 }
 
-let ctx = MLContext()
-// Data is NOT loaded yet; this is a lazy transformation
-let dataView = ctx.Data.LoadFromTextFile<HousingData>("real_estate.csv", hasHeader=true)
-
 ```
 
-> **Mental Model Shift: Schema-First vs. Data-First**
-> In Python/Pandas, you often load data and "discover" its shape at runtime. In F#, you define the **Schema** first. This "Schema-First" approach feels restrictive at first but prevents the common "KeyError" or "NoneType" crashes that plague Python production pipelines.
+### Understanding the Attributes (Decorators)
+
+Unlike Python's dynamic duck-typing, ML.NET uses these attributes to understand how to map raw data to your types:
+
+* **`[<CLIMutable>]`**: F# records are immutable by default, meaning they lack a parameterless constructor. This attribute tells the compiler to generate a "hidden" mutable version that ML.NET can use to hydrate the record via reflection while you treat it as immutable in your code.
+* **`[<LoadColumn(n)>]`**: This tells the `TextLoader` exactly which index in your CSV corresponds to this property. It is the F# equivalent of selecting a column by index in a Pandas `iloc` call.
+* **`[<ColumnName("Name")>]`**: ML.NET's internal engines look for specific column names like "Score" for predictions or "Features" for input vectors. Use this to map your friendly F# field names to the specific strings ML.NET expects.
 
 ---
 
 ## 13.2 Enriching the Pipeline with Deedle
 
-In previous chapters, we used **Deedle** for exploratory data analysis (EDA). In a real-world ML workflow, you use Deedle to clean and join data before passing it to ML.NET for training.
+In a real-world ML workflow, you use **Deedle** to clean and join data before passing it to ML.NET for training.
 
 ### The Python Equivalent (Pandas)
 
@@ -70,76 +69,64 @@ In previous chapters, we used **Deedle** for exploratory data analysis (EDA). In
 # Cleaning data in Pandas
 df = df.dropna()
 df = df[df['Price'] > 0]
-# Convert to numpy for training
 training_data = df.to_numpy()
 
 ```
 
 ### The F# Approach: The "Deedle-to-ML" Bridge
 
-Since ML.NET requires `IDataView` and Deedle uses `Frame`, you can convert a Deedle Frame into an array of F# records, which ML.NET can then consume.
+You can convert a Deedle Frame into an array of F# records, which ML.NET can then consume as an enumerable.
 
 ```fsharp
-#r "nuget: Deedle"
-
 open Deedle
 
-// 1. Use Deedle for complex joins or filtering
+// 1. Use Deedle for complex structural manipulation
 let rawFrame = Frame.ReadCsv("housing_data.csv")
 let cleanedFrame = 
     rawFrame 
     |> Frame.filterRowValues (fun row -> row?Price > 0.0)
     |> Frame.fillMissingWith 0.0
 
-// 2. Convert Deedle Frame to F# Records for ML.NET
+// 2. Convert Frame to Records for ML.NET
 let trainingRecords = cleanedFrame.GetRowsAs<HousingData>()
 
-// 3. Load into ML.NET
+// 3. Hydrate ML.NET's streaming view
+let ctx = MLContext()
 let dataFromDeedle = ctx.Data.LoadFromEnumerable(trainingRecords)
 
 ```
 
 > **Mental Model Shift: Immutability over In-Place Mutation**
-> In Python, `df.dropna(inplace=True)` modifies the existing object. In F# and Deedle, every transformation (`Frame.filterRowValues`) returns a **new** frame. This "chaining" of immutable states ensures that your raw data remains untouched and prevents side effects where one part of your code accidentally breaks another's data.
+> In Python, `df.dropna(inplace=True)` modifies the object. In F# and Deedle, every transformation returns a **new** frame. This prevents side effects where one part of your code accidentally breaks another's data.
 
 ---
 
 ## 13.3 Mathematical Customization with Math.NET
 
-While ML.NET provides high-level trainers, you may occasionally need to perform custom mathematical operations—such as calculating a custom similarity matrix—before feeding features into a model.
+While ML.NET provides high-level trainers, you may need **Math.NET Numerics** for custom linear algebra or statistical preprocessing.
 
 ### The Python Equivalent (NumPy)
 
 ```python
 import numpy as np
-
-# Custom normalization
-mean = np.mean(X, axis=0)
-std = np.std(X, axis=0)
-X_scaled = (X - mean) / std
+X_scaled = (X - np.mean(X)) / np.std(X)
 
 ```
 
 ### The F# Approach: Functional Preprocessing
 
-You can use **Math.NET Numerics** for heavy-duty linear algebra and custom statistical preprocessing.
-
 ```fsharp
-#r "nuget: MathNet.Numerics"
-#r "nuget: MathNet.Numerics.FSharp"
-
 open MathNet.Numerics.LinearAlgebra
 
 let scaleFeatures (data: float32[]) =
     let v = Vector<float32>.Build.Dense(data)
     let mean = v.Mean()
     let std = v.StandardDeviation()
-    // Functional 'pipe' application to return a raw array
     (v - mean) / std |> _.ToArray()
 
 ```
 
-By combining these, your architecture follows a clean flow: **Deedle** for cleaning, **Math.NET** for custom math, and **ML.NET** for efficient training and deployment.
+By combining these, your architecture flows from **Deedle** (cleaning) to **Math.NET** (custom math) and finally to **ML.NET** (training).
 
 ---
 
@@ -147,41 +134,24 @@ By combining these, your architecture follows a clean flow: **Deedle** for clean
 
 ML.NET follows a **Lazy Pipeline Pattern**. You define a chain of **Estimators**, which only execute when you call `.Fit()`.
 
-### The Python Equivalent (scikit-learn Pipeline)
-
-```python
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import SGDRegressor
-
-pipeline = Pipeline([
-    ('scaler', StandardScaler()),
-    ('regressor', SGDRegressor())
-])
-model = pipeline.fit(X, y)
-
-```
-
 ### The F# Approach: Composable Transformers
 
-In F#, the pipeline is a series of functions applied to data. This "Composer" pattern is fundamentally functional.
-
 ```fsharp
-// 1. Build the pipeline (Estimator Chain)
+// 1. Build the Recipe (Estimator Chain)
 let pipeline = 
     ctx.Transforms.Concatenate("Features", "Size", "Bedrooms")
     .Append(ctx.Regression.Trainers.Sdca(labelColumnName = "Price"))
 
 // 2. Train (Fit) the model
-let model = pipeline.Fit(dataView)
+let model = pipeline.Fit(dataFromDeedle)
 
-// 3. Evaluate and Save
-let metrics = ctx.Regression.Evaluate(model.Transform(dataView), "Price")
-ctx.Model.Save(model, dataView.Schema, "HousingModel.zip")
+// 3. Save as a standalone artifact
+ctx.Model.Save(model, dataFromDeedle.Schema, "HousingModel.zip")
 
 ```
 
 > **Mental Model Shift: The Pipeline as a "Recipe"**
-> In Python, you often feel like you are "running" steps one by one. In ML.NET/F#, you are building a **Recipe** (the Pipeline). Nothing happens—no data is read, no math is performed—until `Fit()` is called. This allows the .NET runtime to optimize memory and CPU usage across the entire chain.
+> In ML.NET/F#, you are building a **Recipe** (the Pipeline). No data is read and no math is performed until `Fit()` is called. This allows the .NET runtime to optimize memory and CPU usage across the entire chain.
 
 ---
 
@@ -197,14 +167,14 @@ ctx.Model.Save(model, dataView.Schema, "HousingModel.zip")
 
 ### Key Takeaways
 
-1. **Streaming vs. RAM:** ML.NET's `IDataView` allows you to handle datasets that would crash a Python script by streaming from disk.
-2. **The "Safety First" Tax:** Defining schemas up front takes more time than Python's `read_csv`, but it eliminates entire classes of runtime errors.
-3. **No Interop Tax:** Because Deedle, Math.NET, and ML.NET are all native .NET libraries, data flows between them with zero performance overhead.
+1. **Streaming vs. RAM:** ML.NET's `IDataView` handles datasets that would crash Python by streaming from disk.
+2. **The "Safety First" Tax:** Defining schemas with attributes like `[<LoadColumn>]` prevents runtime crashes.
+3. **No Interop Tax:** Deedle, Math.NET, and ML.NET are all native .NET libraries; data flows between them with zero performance overhead.
 
 ---
 
 ## Exercises
 
-1. **The Bridge:** Create a small Deedle Frame and convert it to an `IDataView` using `LoadFromEnumerable`. What happens if your record types don't match the column names exactly?
-2. **Feature Engineering:** Use Math.NET to calculate the Z-score of a feature before feeding it into ML.NET. How does F#'s pipe operator (`|>`) make this cleaner than nested Python calls?
-3. **Lazy Execution:** Explain why an error in your CSV file (like a text string in a number column) might not be caught until the very last line of your script calls `pipeline.Fit(data)`.
+1. **The Bridge:** Convert a Deedle Frame to an `IDataView`. What happens if you forget the `[<CLIMutable>]` attribute on your record?
+2. **Attribute Mapping:** Use `[<ColumnName("Label")>]` to map a field called `MarketValue` so that an ML.NET trainer recognizes it as the target.
+3. **Lazy Execution:** Explain why an error in your CSV might not be caught until you call `pipeline.Fit(data)`.
