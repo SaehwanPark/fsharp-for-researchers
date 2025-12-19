@@ -88,7 +88,10 @@ let cleanedFrame =
     |> Frame.fillMissingWith 0.0
 
 // 2. Convert Frame to Records for ML.NET
-let trainingRecords = cleanedFrame.GetRowsAs<HousingData>()
+// Get the rows as a Series
+let trainingSeries = cleanedFrame.GetRowsAs<HousingData>()
+// Convert the Series values into a sequence to be compatible with LoadFromEnumerable below
+let trainingRecords = trainingSeries.Values 
 
 // 3. Hydrate ML.NET's streaming view
 let ctx = MLContext()
