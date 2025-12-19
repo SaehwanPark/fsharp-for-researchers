@@ -120,13 +120,14 @@ X_scaled = (X - np.mean(X)) / np.std(X)
 
 ```fsharp
 open MathNet.Numerics.LinearAlgebra
+open MathNet.Numerics.Statistics // without this, you cannot invoke Mean(), StandardDeviation()
 
 let scaleFeatures (data: float32[]) =
-    let v = Vector<float32>.Build.Dense(data)
-    let mean = v.Mean()
-    let std = v.StandardDeviation()
-    (v - mean) / std |> _.ToArray()
-
+  let v = Vector<float32>.Build.Dense(data)
+  let mean = float32 (v.Mean()) // need to cast float (more precise) to float32
+  let std= float32 (v.StandardDeviation())
+  (v - mean)/std // note you cannot broadcast float to float32 vector!
+  |> _.ToArray
 ```
 
 By combining these, your architecture flows from **Deedle** (cleaning) to **Math.NET** (custom math) and finally to **ML.NET** (training).
