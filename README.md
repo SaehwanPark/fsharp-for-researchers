@@ -71,14 +71,10 @@ You can read the book directly in this repository. The content is located in the
 
 ### **Part IV — Advanced and Forward-Looking**
 
-  * **[Chapter 13: Interoperability and Ecosystem Bridges](content/chapter13.md)**
-      * *Using Python libraries via Python.NET, Deep Learning with TorchSharp, and calling C/Rust via FFI.*
+  * **[Chapter 13: High-Performance Machine Learning with ML.NET](content/chapter13.md)**
+      * *Exploring the high-performance ML.NET framework, demonstrating how to integrate it with Deedle and Math.NET to build type-safe machine learning pipelines*
   * **[Chapter 14: Designing Research Systems That Last](content/chapter14.md)**
       * *Architectural patterns (Functional Core/Imperative Shell), data provenance, and API design.*
-
-  * **[Project: Hybrid Sentiment Bridge](projects/module4/)**
-      * **Scenario:** Integrating a legacy Python machine learning function into a clean F# codebase.
-      * **Key Concepts:** Interoperability via `Python.NET`, software architecture (Dependency Injection), and building "Anti-Corruption Layers" to protect domain logic from external dynamic types.
 
 ### **Back Matter**
 
