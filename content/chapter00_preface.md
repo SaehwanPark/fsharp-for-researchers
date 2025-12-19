@@ -1,6 +1,6 @@
 # Preface
 
-Welcome to a book written for the researcher who is tired of debugging runtime errors at 2:00 AM.
+Welcome to a thin-ish book written for the researcher who is tired of debugging runtime errors at 2:00 AM.
 
 If you are reading this, you are likely comfortable with Python. You have probably spent years mastering NumPy arrays, wrangling pandas DataFrames, and generating Matplotlib charts. You know the power of the Python ecosystem—the immense library of tools that allows you to go from a blank file to a working prototype in an afternoon.
 
@@ -38,7 +38,7 @@ We will follow the natural evolution of a research project:
 * **Part I: Foundations** translates your existing Python knowledge into F#. You will learn how to read code, use the interactive REPL, and why types are your best friend.
 * **Part II: Scientific Patterns** focuses on the work you do every day: parsing CSVs, running simulations, and performing numerical analysis—but doing it safely.
 * **Part III: Engineering** teaches you how to structure, test, and parallelize your code. This is where you transition from "coder" to "research engineer."
-* **Part IV: Architecture** looks at the big picture: interoperability with Python/C++, designing reproducible systems, and building tools that last.
+* **Part IV: Architecture** looks at the big picture: interoperability with ML.Net, designing reproducible systems, and building tools that last.
 
 ## A Note to the Reader
 
@@ -48,7 +48,7 @@ I promise you the investment is worth it. Once you experience the peace of mind 
 
 Let’s begin.
 
-**Sae-Hwan Park**
+**Sae-Hwan Park, PhD**
 *December 2025*
 
 ---
