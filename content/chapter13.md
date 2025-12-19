@@ -32,6 +32,8 @@ y = df['Price']
 F# excels at defining data schemas. By using **Record Types** and the `LoadColumn` attribute, you bridge the gap between raw data and the type system.
 
 ```fsharp
+#r "nuget: Microsoft.ML"
+
 open Microsoft.ML
 open Microsoft.ML.Data
 
@@ -78,6 +80,8 @@ training_data = df.to_numpy()
 Since ML.NET requires `IDataView` and Deedle uses `Frame`, you can convert a Deedle Frame into an array of F# records, which ML.NET can then consume.
 
 ```fsharp
+#r "nuget: Deedle"
+
 open Deedle
 
 // 1. Use Deedle for complex joins or filtering
@@ -121,6 +125,9 @@ X_scaled = (X - mean) / std
 You can use **Math.NET Numerics** for heavy-duty linear algebra and custom statistical preprocessing.
 
 ```fsharp
+#r "nuget: MathNet.Numerics"
+#r "nuget: MathNet.Numerics.FSharp"
+
 open MathNet.Numerics.LinearAlgebra
 
 let scaleFeatures (data: float32[]) =
