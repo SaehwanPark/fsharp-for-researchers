@@ -1,6 +1,6 @@
 ![F# logo](https://fsharp.org/img/logo/fsharp512.png)
 
-# 📘 F\# for Researchers
+# 📘 F\# Cookbook for Researchers
 
 Author:
 
